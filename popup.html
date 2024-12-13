@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+    }
+    .input-group {
+      margin-bottom: 10px;
+    }
+    #results {
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="input-group">
+    <label for="baseUrl">Base URL:</label>
+    <input type="text" id="baseUrl" placeholder="https://api.example.com">
+  </div>
+  <div class="input-group">
+    <label for="apiKey">API Key:</label>
+    <input type="text" id="apiKey" placeholder="Enter your API key">
+  </div>
+  <button id="testButton">Test API Models</button>
+  <div id="results"></div>
+  <script src="popup.js"></script>
+</body>
+</html> 

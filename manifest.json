@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "API Model Tester",
+  "version": "1.0",
+  "description": "Test API models availability",
+  "action": {
+    "default_icon": {
+      "48": "icons/icon48.png"
+    }
+  },
+  "permissions": [
+    "tabs",
+    "scripting",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+} 

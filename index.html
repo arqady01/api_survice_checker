@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>API Model Tester</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    .input-group input:focus {
+      outline: none;
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 38px;
+      cursor: pointer;
+      color: #666;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #results {
+      margin-top: 30px;
+    }
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 20px;
+    }
+    .model-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .model-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .model-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .model-card h3 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 18px;
+      flex-grow: 1;
+    }
+    .copy-button {
+      background: none;
+      border: none;
+      padding: 8px;
+      color: #4CAF50;
+      cursor: pointer;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .copy-button:hover {
+      color: #45a049;
+      background: none;
+    }
+    .tooltip {
+      position: absolute;
+      background: #333;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      top: -30px;
+      right: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    .tooltip.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      right: 10px;
+      border-width: 5px 5px 0;
+      border-style: solid;
+      border-color: #333 transparent transparent;
+    }
+    .model-info {
+      margin: 12px 0;
+      color: #666;
+      font-size: 14px;
+    }
+    .model-info div {
+      margin: 6px 0;
+    }
+    .model-permission {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    .permission-item {
+      display: inline-block;
+      margin: 3px 6px 3px 0;
+      padding: 4px 8px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #555;
+    }
+    .permission-item.active {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    .error-message {
+      color: #d32f2f;
+      padding: 15px;
+      background-color: #ffebee;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .copy-all-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: none; /* 默认隐藏 */
+    }
+    
+    .copy-all-button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    
+    .copy-all-button:hover {
+      background-color: #45a049;
+    }
+    
+    .copy-all-button i {
+      font-size: 16px;
+    }
+    .model-test-container {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .test-model-button {
+      background-color: #2196F3;
+      margin-top: 10px;
+    }
+
+    .test-model-button:hover {
+      background-color: #1976D2;
+    }
+
+    .model-status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .model-status.success {
+      background-color: #E8F5E9;
+      color: #2E7D32;
+      border: 1px solid #A5D6A7;
+    }
+
+    .model-status.error {
+      background-color: #FFEBEE;
+      color: #C62828;
+      border: 1px solid #FFCDD2;
+    }
+
+    .model-status.loading {
+      background-color: #E3F2FD;
+      color: #1565C0;
+      border: 1px solid #90CAF9;
+    }
+
+    .scroll-buttons {
+      position: fixed;
+      right: 30px;
+      bottom: 30px;
+      display: flex !important; /* 使用 !important 确保始终显示 */
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+      opacity: 0.8; /* 添加半透明效果 */
+      transition: opacity 0.3s;
+    }
+
+    .scroll-buttons:hover {
+      opacity: 1; /* 鼠标悬停时完全不透明 */
+    }
+
+    .scroll-button {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #fff;
+      border: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      transition: all 0.3s ease;
+      padding: 0;
+    }
+
+    .scroll-button:hover {
+      background-color: #4CAF50;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .scroll-button i {
+      font-size: 24px;
+    }
+
+    /* 在小屏幕上调整位置 */
+    @media (max-width: 768px) {
+      .scroll-buttons {
+        right: 15px;
+        bottom: 15px;
+      }
+    }
+
+    /* 添加新的样式 */
+    .model-card.available {
+      background-color: #E8F5E9;
+      border-color: #A5D6A7;
+    }
+
+    .model-card.unavailable {
+      background-color: #FFEBEE;
+      border-color: #FFCDD2;
+    }
+
+    .model-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .test-button {
+      background: none;
+      border: none;
+      padding: 8px;
+      color: #2196F3;
+      cursor: pointer;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .test-button:hover {
+      color: #1976D2;
+    }
+
+    .test-button.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .test-button i.fa-spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>API Model Tester</h1>
+  <div class="input-group">
+    <label for="baseUrl">Base URL:</label>
+    <input type="text" id="baseUrl" placeholder="https://api.example.com">
+  </div>
+  <div class="input-group">
+    <label for="apiKey">API Key:</label>
+    <input type="password" id="apiKey" placeholder="Enter your API key">
+    <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+  </div>
+  <button id="testButton">
+    <i class="fas fa-vial"></i> Test API Models
+  </button>
+  <div id="results"></div>
+  <div class="copy-all-container" id="copyAllContainer">
+    <button class="copy-all-button" id="copyAllButton">
+      <i class="fas fa-copy"></i>
+      复制全部模型
+    </button>
+  </div>
+  <div class="model-test-container">
+    <div class="input-group">
+      <label for="modelName">模型名称:</label>
+      <input type="text" id="modelName" placeholder="输入要测试的模型名称，多个模型用英文逗号分隔">
+    </div>
+    <button id="testModelButton" class="test-model-button">
+      <i class="fas fa-check-circle"></i> 测试模型可用性
+    </button>
+  </div>
+  <div class="scroll-buttons">
+    <button id="scrollTop" class="scroll-button" title="回到顶部">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <button id="scrollBottom" class="scroll-button" title="去到底部">
+      <i class="fas fa-arrow-down"></i>
+    </button>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 
